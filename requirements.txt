@@ -1,0 +1,16 @@
+fastapi
+pydantic-settings
+cryptography
+dataclasses
+python-multipart
+opencv-python
+jinja2
+uvicorn
+termcolor
+rich
+python-dotenv 
+psycopg2
+bcrypt
+pytessract
+requests
+Pillow

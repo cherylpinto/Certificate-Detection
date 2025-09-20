@@ -1,0 +1,3 @@
+from src.certificate_data_extraction.certificate_image_data_extraction import CertificateDataExtractor
+
+__all__ = ["CertificateDataExtractor"]
