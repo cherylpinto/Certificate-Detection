@@ -42,3 +42,6 @@
 2025-09-20 15:51:05,192 - Certificate Data Extractor - INFO - OCR processing completed.
 2025-09-20 15:51:05,823 - Certificate Data Extractor - INFO - LLM processing started.
 2025-09-20 15:59:41,163 - Certificate Data Extractor - INFO - LLM processing completed.
+2025-09-20 17:18:04,379 - Certificate Data Extractor - INFO - OCR processing completed.
+2025-09-20 17:18:04,389 - Certificate Data Extractor - INFO - LLM processing started.
+2025-09-20 17:24:51,379 - Certificate Data Extractor - INFO - LLM processing completed.

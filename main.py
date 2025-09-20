@@ -113,27 +113,29 @@ def _collect_response_text(response):
         return ""
 
 def extract_first_json(text: str):
-    """Try to extract a JSON object from the model output. Returns Python dict or None."""
+    """Extract the first {...} JSON object from a string."""
     if not text:
         return None
-    # Try direct load
-    try:
-        return json.loads(text)
-    except Exception:
-        pass
-    # Try to find the first {...} block
-    m = re.search(r'(\{(?:[^{}]|(?R))*\})', text, re.S)
-    if m:
-        candidate = m.group(1)
-        try:
-            return json.loads(candidate)
-        except Exception:
-            # attempt simple fixes (replace single quotes)
-            try:
-                fixed = candidate.replace("'", '"')
-                return json.loads(fixed)
-            except Exception:
-                return None
+    text = text.strip()
+    start = text.find('{')
+    if start == -1:
+        return None
+    brace_count = 0
+    for i, c in enumerate(text[start:], start):
+        if c == '{':
+            brace_count += 1
+        elif c == '}':
+            brace_count -= 1
+            if brace_count == 0:
+                candidate = text[start:i+1]
+                try:
+                    return json.loads(candidate)
+                except Exception:
+                    try:
+                        fixed = candidate.replace("'", '"')
+                        return json.loads(fixed)
+                    except Exception:
+                        return None
     return None
 
 # ---------- Main classifier (hybrid) ----------
@@ -220,18 +222,30 @@ async def home():
         <pre id="result"></pre>
       </div>
       <script>
-        const form = document.getElementById("uploadForm");
-        form.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const fileInput = document.getElementById("fileInput");
-          if (!fileInput.files.length) return;
-          const formData = new FormData();
-          formData.append("file", fileInput.files[0]);
-          const resp = await fetch("/upload/", { method: "POST", body: formData });
-          const data = await resp.json();
-          document.getElementById("result").innerText = JSON.stringify(data, null, 2);
-        });
-      </script>
+    const form = document.getElementById("uploadForm");
+    form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fileInput = document.getElementById("fileInput");
+    if (!fileInput.files.length) return;
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    const resp = await fetch("/upload/", { method: "POST", body: formData });
+    const data = await resp.json();
+
+    let displayText = "";
+    if (data.result && data.result.parsed) {
+        displayText = JSON.stringify(data.result.parsed, null, 2);
+    } else if (data.warning) {
+        displayText = data.warning + "\n\n" + JSON.stringify(data.result, null, 2);
+    } else {
+        displayText = JSON.stringify(data, null, 2);
+    }
+
+    document.getElementById("result").innerText = displayText;
+    });
+    </script>
     </body>
     </html>
     """
